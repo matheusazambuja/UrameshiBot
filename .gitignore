@@ -1,2 +1,5 @@
 *.venv
 selector_test.py
+
+# dotenv
+env
