@@ -5,11 +5,12 @@ from datetime import datetime
 from dotenv import load_dotenv
 from os import getenv
 from random import choice
+from time import sleep
 
 
 prefix = '!'
 
-load_dotenv()
+load_dotenv('env')
 TOKEN = getenv('DISCORD_TOKEN')
 GUILD = getenv('DISCORD_GUILD')
 
@@ -69,10 +70,6 @@ async def help(ctx):
         value="Server's informations from this server",
         inline=False)
     embed.add_field(
-        name=f'- Command: ```{prefix}99```',
-        value='Quotes by 99',
-        inline=False)
-    embed.add_field(
         name=f'- Command: ```{prefix}songs```',
         value='Name of openings and closings of the researched anime',
         inline=False)
@@ -80,34 +77,15 @@ async def help(ctx):
         name=f'- Command: ```{prefix}broadcast```',
         value='Anime broadcast time',
         inline=False)
+    embed.add_field(
+        name=f'- Command: ```{prefix}schedule```',
+        value='Anime schedule for someday in this season (Input week of day)',
+        inline=False)
     embed.set_footer(
         text='Requested by ' + ctx.message.author.name,
         icon_url=ctx.message.author.avatar_url)
 
     await ctx.send(embed=embed)
-
-
-@bot.command(name='99', help='Responds with a random quote from Brooklyn 99')
-async def nine_nine(ctx):
-    brooklyn_99_quoted = [
-        'I\'m the human form of the 💯 emoji.',
-        'Bingpot!',
-        (
-            'Cool. Cool cool cool cool cool cool cool, '
-            'no doubt no doubt no doubt no doubt.'
-        ),
-    ]
-    response = choice(brooklyn_99_quoted)
-    await ctx.channel.send(response)
-
-
-@bot.command(name='roll_dice', help='Simulates rolling dice.')
-async def roll(ctx, number_of_dice: int, number_of_sides: int):
-    dice = [
-        str(choice(range(1, number_of_sides + 1)))
-        for _ in range(number_of_dice)
-    ]
-    await ctx.send(', '.join(dice))
 
 
 @bot.command(name='songs', help='Name of openings and closings of the researched anime')
@@ -153,6 +131,58 @@ async def songs(ctx, *name: str):
         await ctx.send('```No results for this anime```')
 
 
+@bot.command(name='schedule', help='Anime schedule for someday in this season (Input week of day)')
+async def schedule(ctx, *day: str):
+    days_of_week = [
+        'monday', 'tuesday', 'wednesday',
+        'thursday', 'friday', 'saturday', 'sunday']
+
+    if ' '.join(day).lower() in days_of_week:
+        jikan = Jikan()
+        animes_today = jikan.schedule(day=' '.join(day))
+
+        if animes_today[' '.join(day)]:
+            for anime in animes_today[' '.join(day)]:
+                sleep(1)
+                embed = discord.Embed(
+                    title=f' :popcorn:  {anime["title"]}',
+                    color=discord.Color.green())
+                embed.set_thumbnail(url=anime['image_url'])
+                if anime["synopsis"] and len(anime["synopsis"]) > 1022:
+                    synopsis = anime['synopsis']
+                    list_synopsis = []
+                    while len(synopsis) > 1000:
+                        list_synopsis.append(synopsis[0:999])
+                        synopsis = synopsis[1000:]
+                    list_synopsis.append(synopsis)
+                    for s in list_synopsis:
+                        embed.add_field(
+                            name=f':books:  Synopsis:',
+                            value=f'```{s}```',
+                            inline=False)
+                else:
+                    embed.add_field(
+                        name=f':books:  Synopsis:',
+                        value=f'```{anime["synopsis"]}```',
+                        inline=False)
+                embed.add_field(
+                    name=f'Genres:',
+                    value=f'```{", ".join([g["name"] for g in anime["genres"]])}```',
+                    inline=False)
+                embed.add_field(
+                    name=f':globe_with_meridians:  Link Mal (Myanimelist.net):',
+                    value=f'```{anime["url"]}```',
+                    inline=False)
+                embed.set_footer(
+                    text='Requested by ' + ctx.message.author.name,
+                    icon_url=ctx.message.author.avatar_url)
+                await ctx.send(embed=embed)
+        else:
+            await ctx.send(f'```No results```')
+    else:
+        await ctx.send(f'```Input error: day '{" ".join(day)}' undefined```')
+
+
 @bot.command(name='broadcast', help='Anime broadcast time')
 async def broadcast(ctx, *name: str):
     jikan = Jikan()
@@ -181,23 +211,23 @@ async def broadcast(ctx, *name: str):
                 color=discord.Color.green())
             embed.set_thumbnail(url=anime_found['image_url'])
             embed.add_field(
-                name=f'- :hourglass_flowing_sand:  Status:',
+                name=f':hourglass_flowing_sand:  Status:',
                 value=f'```{anime_found["status"]}```',
                 inline=False)
             embed.add_field(
-                name=f'- {emoji_season}  Season:',
+                name=f'{emoji_season}  Season:',
                 value=f'```{anime_found["premiered"]}```',
                 inline=False)
             embed.add_field(
-                name=f'- Total Episodes:',
+                name=f':ballot_box_with_check:  Total Episodes:',
                 value=f'```{anime_found["episodes"]}```',
                 inline=False)
             embed.add_field(
-                name=f'- :watch:  Broadcast in Japan:',
+                name=f':watch:  Broadcast in Japan:',
                 value=f'```{anime_found["broadcast"]}```',
                 inline=False)
             embed.add_field(
-                name=f'- :globe_with_meridians:  Link Mal (Myanimelist.net):',
+                name=f':globe_with_meridians:  Link Mal (Myanimelist.net):',
                 value=f'```{anime_found["url"]}```',
                 inline=False)
             embed.set_footer(
@@ -218,7 +248,7 @@ async def broadcast(ctx, *name: str):
                 value=f'```{anime_found["premiered"]}```',
                 inline=False)
             embed.add_field(
-                name=f'- Total Episodes:',
+                name=f':ballot_box_with_check:  Total Episodes:',
                 value=f'```{anime_found["episodes"]}```',
                 inline=False)
             embed.add_field(
