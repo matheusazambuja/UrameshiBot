@@ -1,5 +1,6 @@
 import jikanpy
 from time import sleep
+from services import utils
 
 
 def search(name: str):
@@ -9,11 +10,13 @@ def search(name: str):
         animes_researched = jikan.search(search_type='anime', query=name)
         if animes_researched:
             if animes_researched['results']:
-                return {
-                    'found': True,
-                    'id': animes_researched['results'][0]['mal_id'],
-                    'error': None
-                }
+                results = utils.sort_animes(animes_researched['results'], query=name)
+                if results:
+                    return {
+                        'found': True,
+                        'id': results[0]['mal_id'],
+                        'error': None
+                    }
         return {
             'found': False,
             'id': -1,
