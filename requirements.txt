@@ -1,0 +1,16 @@
+aiohttp==3.6.2
+async-timeout==3.0.1
+attrs==20.1.0
+certifi==2020.6.20
+chardet==3.0.4
+discord==1.0.1
+discord.py==1.4.1
+idna==2.10
+jikanpy==4.2.2
+multidict==4.7.6
+python-dotenv==0.14.0
+requests==2.24.0
+simplejson==3.17.2
+typing-extensions==3.7.4.3
+urllib3==1.25.10
+yarl==1.5.1
