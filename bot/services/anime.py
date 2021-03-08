@@ -1,15 +1,14 @@
 import jikanpy
 from time import sleep
 
-
 def anime(anime_id: int, command: str):
     jikan = jikanpy.Jikan()
     sleep(1)
     try:
         anime = jikan.anime(id=anime_id)
         if anime:
-            if command == 'broadcast':
-                return {
+            objects_return = {
+                'broadcast': {
                     'found': True,
                     'error': None,
                     'airing': anime['airing'],
@@ -21,9 +20,8 @@ def anime(anime_id: int, command: str):
                     'episodes': anime['episodes'],
                     'broadcast': anime['broadcast'],
                     'url': anime['url']
-                }
-            elif command == 'songs':
-                return {
+                }, 
+                'songs': {
                     'found': True,
                     'error': None,
                     'title': anime['title'],
@@ -31,9 +29,8 @@ def anime(anime_id: int, command: str):
                     'image_url': anime['image_url'],
                     'op': anime['opening_themes'],
                     'end': anime['ending_themes']
-                }
-            elif command == 'seasons':
-                return {
+                }, 
+                'seasons' : {
                     'found': True,
                     'error': None,
                     'type': anime['type'],
@@ -47,8 +44,15 @@ def anime(anime_id: int, command: str):
                     'url': anime['url'],
                     'related': anime['related']
                 }
+            }
+
+            if command in objects_return.keys():
+                return objects_return[command]
         else:
-            return {'found': False, 'error': 'empty'}
+            return {
+                'found': False,
+                'error': 'empty'
+            }
     except jikanpy.exceptions.APIException as e:
         return {
             'found': False,

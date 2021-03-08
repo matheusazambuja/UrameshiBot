@@ -1,6 +1,7 @@
 *.venv
 selector_test.py
 __pycache__/
+*.vscode
 
 # dotenv
 env
