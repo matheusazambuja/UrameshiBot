@@ -106,8 +106,8 @@ async def cmd_songs(ctx, *name: str):
             await ctx.send(embed=embed)
 
     if not anime_found['found']:
-        if 'api_error' in anime_found: await ctx.send('```API error```')
-        else: await ctx.send('```No results for this anime```')
+        await ctx.send(utils.help_messages(anime_found['error']))
+
 
 
 @bot.command(name='schedule', help='Anime schedule for someday in this season (Input week of day)')

@@ -3,12 +3,12 @@ from services.anime import anime
 
 def help_messages(error_code):
     possible_codes = [
-        ['empty', '```It looks like there are no episodes today for any anime. 😢```'], 
+        ['empty', '```It looks like there are no result for this anime. 😢```'], 
         ['api_error', '```Something went wrong 🤔. Please try again!```'],
         ['parameter_error', '```Parameter incorrect ⌨: Incorrect day parameter```'],
     ]
 
-    return list(filter(lambda element: element[0] == 'empty', possible_codes)[0][-1])
+    return list(filter(lambda element: element[0] == 'empty', possible_codes))[0][-1]
 
 def validate_day_week(day: str):
     days_of_week = [
